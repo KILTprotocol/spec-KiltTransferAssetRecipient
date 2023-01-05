@@ -49,26 +49,23 @@ An example of the object described is given below.
 ```json
 {
   "polkadot:411f057b9107718c9624d6aa4a3f23c1/slip44:2086": [
-    "~4qBSZdEoUxPVnUqbX8fjXovgtQXcHK7ZvSf56527XcDZUukq",
-    "~4oHvgA54py7SWFPpBCoubAajYrxj6xyc8yzHiAVryeAq574G"
-    "~4taHgf8x9U5b8oJaiYoNEh61jaHpKs9caUdattxfBRkJMHvm"
+    "4qBSZdEoUxPVnUqbX8fjXovgtQXcHK7ZvSf56527XcDZUukq",
+    "4oHvgA54py7SWFPpBCoubAajYrxj6xyc8yzHiAVryeAq574G"
+    "4taHgf8x9U5b8oJaiYoNEh61jaHpKs9caUdattxfBRkJMHvm"
   ],
-  "polkadot:91b171bb158e2d3848fa23a9f1c25182/slip44:354": [
-    "~15qomv8YFTpHrbiJKicP4oXfxRDyG4XEHZH7jdfJScnw2xnV",
-    "~15JGaHWAu1nAEtMMjKZSeu8VsYoTBMmoJq6uwxsDBqmwytSN",
+  "eip:1/slip44:60": [
+    "0x8f8221AFBB33998D8584A2B05749BA73C37A938A",
+    "0x6b175474e89094c44da98b954eedeac495271d0f",
   ]
 }
 ```
 
-Each asset is identified by its [CAIP-19 identifier][caip-19-spec]. The value of the property for each asset MUST be a set of accounts that can take one of two possible representations:
-
-- If the account lives on the same chain as the asset, the [CAIP-2 identifier][caip-2-spec] of the chain is omitted and replaced with a `~` sign.
-- If the account lives on a different chain (e.g., when the transfer can happen via some bridges), the full [CAIP-10 identifier][caip-10-spec] for the account must be included.
+Each asset is identified by its [CAIP-19 identifier][caip-19-spec]. The value of the property for each asset MUST be a set of accounts that are encoding following the [CAIP-10][caip-10-spec] specification for the chain the asset lives on.
 
 Hence, the example above shows a `KiltTransferAssetRecipientV1` endpoint indicating other parties that the DID subject can accept transfers of the following two assets:
 
 - *KILT Spiritnet tokens* sent to either of the addresses `4qBSZdEoUxPVnUqbX8fjXovgtQXcHK7ZvSf56527XcDZUukq`, `4oHvgA54py7SWFPpBCoubAajYrxj6xyc8yzHiAVryeAq574G`, or `4taHgf8x9U5b8oJaiYoNEh61jaHpKs9caUdattxfBRkJMHvm` on the Spiritnet parachain.
-- *Polkadot tokens* sent to either of the addresses `15qomv8YFTpHrbiJKicP4oXfxRDyG4XEHZH7jdfJScnw2xnV`, or `15JGaHWAu1nAEtMMjKZSeu8VsYoTBMmoJq6uwxsDBqmwytSN` on the Polkadot chain.
+- *Ether tokens* sent to either of the addresses `0x8f8221AFBB33998D8584A2B05749BA73C37A938A`, or `0x6b175474e89094c44da98b954eedeac495271d0f` on the Ethereum mainnet.
 
 ## Security considerations
 
