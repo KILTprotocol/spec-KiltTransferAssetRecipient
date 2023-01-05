@@ -25,12 +25,15 @@ For more information about the KILT DID method, please visit our [official speci
 A service endpoint of type `KiltTransferAssetRecipientV1` does not include any additional properties compared to what is defined within the [relative section of the official DID Core spec][did-core-spec-services].
 Furthermore, endpoints of such type MUST include at least *one* URI for the `serviceEndpoint` property.
 The `id` property of the endpoint MUST be the [multibase][multibase] representation of the Blake256 output calculated from the Base64 encoding of the resource dereferenced by the URIs in `serviceEndpoint`.
+The multibase chosen must yield values that do not contain invalid characters as per the definition of the `id` property in the DID specification, i.e., the resulting `id` must still be a valid URI conforming to [RFC3986][rfc3986].
 
 Hence, calling `M` the multibase encoding operation of some data, `H` the Blake256 hashing, and `E` the Base64Url encoding, the service `id` for a given object `O` is `M(H(E(O)))`.
 
+For example, with an object `O` being the string `Hello, world!`, and the multibase `M` being `base64urlpad`, the resulting service endpoint looks like the following:
+
 ```json
 {
-  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#",
+  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#UtdpEHP5yrgQu9NKxd0KQf2dd5NpXRi1MNgnC4u11WXA",
   "type": [
     "KiltTransferAssetRecipientV1"
   ],
@@ -81,3 +84,4 @@ Failure to verify this condition MUST be treated as an attack either towards the
 [caip-19-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-19.md
 [caip-2-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-2.md
 [caip-10-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md
+[rfc3986]: https://www.w3.org/TR/did-core/#bib-rfc3986
