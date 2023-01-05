@@ -29,11 +29,11 @@ The multibase chosen must yield values that do not contain invalid characters as
 
 Hence, calling `M` the multibase encoding operation of some data, `H` the Blake256 hashing, and `E` the Base64Url encoding, the service `id` for a given object `O` is `M(H(E(O)))`.
 
-For example, with an object `O` being the string `Hello, world!`, and the multibase `M` being `base64urlpad`, the resulting service endpoint looks like the following:
+For example, with an object `O` being the `serviceEndpoint` below, and the multibase `M` being `base64urlpad`, the resulting service endpoint looks like the following:
 
 ```json
 {
-  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#UtdpEHP5yrgQu9NKxd0KQf2dd5NpXRi1MNgnC4u11WXA",
+  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#URhPvFupY0SiEeUmziMeQAjk2LapJZJ7BShi_pwvSUKM",
   "type": [
     "KiltTransferAssetRecipientV1"
   ],
