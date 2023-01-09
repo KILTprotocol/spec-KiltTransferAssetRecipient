@@ -24,7 +24,7 @@ For more information about the KILT DID method, please visit our [official speci
 
 A service endpoint of type `KiltTransferAssetRecipientV1` does not include any additional properties compared to what is defined within the [relative section of the official DID Core spec][did-core-spec-services].
 Furthermore, endpoints of such type MUST include at least *one* URI for the `serviceEndpoint` property.
-Each of the URIs in `serviceEndpoint`, when dereferenced, MUST return **an object** which contains a mapping from each type of asset to the list of accounts the DID subject controls for that asset.
+Each of the URIs in `serviceEndpoint`, when dereferenced, MUST return **a JSON containing an object** with a mapping from each type of asset to the list of accounts the DID subject controls for that asset.
 An example of the object described is given below.
 
 ```json
