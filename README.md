@@ -42,7 +42,7 @@ An example of the object described is given below.
 ```
 
 Each asset is identified by its [CAIP-19 identifier][caip-19-spec].
-The value of the property for each asset MUST be a set of accounts that are encoding following the [CAIP-10][caip-10-spec] specification for the chain the asset lives on.
+The value of the property for each asset MUST be a set of accounts taken as the `account_address` part of the [CAIP-10][caip-10-spec] specification for the chain the asset lives on.
 
 Hence, the example above shows a `KiltTransferAssetRecipientV1` endpoint indicating other parties that the DID subject can accept transfers of the following two assets:
 
