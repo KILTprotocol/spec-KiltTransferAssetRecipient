@@ -42,7 +42,10 @@ An example of the object described is given below.
 ```
 
 Each asset is identified by its [CAIP-19 identifier][caip-19-spec].
-The value of the property for each asset MUST be a set of accounts taken as the `account_address` part of the [CAIP-10][caip-10-spec] specification for the chain the asset lives on.
+The value of the property for each asset MUST be a set of accounts encoded according to the chain rules.
+For example, for Spiritnet accounts, the account is the base58-prefixed encoding of the Spiritnet chain ID + the account public key.
+For Ethereum accounts, it's the 20-byte HEX representation of the account public key, prefixed with `0x`.
+Other chains have different encoding rules for accounts, and each chain defines the format and encoding logic for public keys representing accounts on those chains.
 
 Hence, the example above shows a `KiltTransferAssetRecipientV1` endpoint indicating other parties that the DID subject can accept transfers of the following two assets:
 
@@ -81,5 +84,5 @@ Failure to verify this condition MUST be treated as an attack either towards the
 [did-core-spec-services]: https://www.w3.org/TR/did-core/#services=
 [caip-19-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-19.md
 [caip-2-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-2.md
-[caip-10-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md
+[caip-13-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-13.md
 [rfc3986]: https://www.w3.org/TR/did-core/#bib-rfc3986
