@@ -10,7 +10,7 @@
 ### Version History
 
 <!-- TODO: Update before releasing -->
-- **v1.0 - Jan.04 2023**: Initial spec publishing
+- **v1.0 - Feb.09 2023**: Initial spec publishing
 
 ---
 
@@ -24,19 +24,32 @@ For more information about the KILT DID method, please visit our [official speci
 
 A service endpoint of type `KiltTransferAssetRecipientV1` does not include any additional properties compared to what is defined within the [relative section of the official DID Core spec][did-core-spec-services].
 Furthermore, endpoints of such type MUST include at least *one* URI for the `serviceEndpoint` property.
-Each of the URIs in `serviceEndpoint`, when dereferenced, MUST return **a JSON containing an object** with a mapping from each type of asset to the list of accounts the DID subject controls for that asset.
+Each of the URIs in `serviceEndpoint`, when dereferenced, MUST return **a JSON containing an object** with a mapping from each type of asset to the list of accounts the DID subject controls for that asset, optionally with a description of each account.
 An example of the object described is given below.
 
 ```json
 {
   "polkadot:411f057b9107718c9624d6aa4a3f23c1/slip44:2086": [
-    "4qBSZdEoUxPVnUqbX8fjXovgtQXcHK7ZvSf56527XcDZUukq",
-    "4oHvgA54py7SWFPpBCoubAajYrxj6xyc8yzHiAVryeAq574G",
-    "4taHgf8x9U5b8oJaiYoNEh61jaHpKs9caUdattxfBRkJMHvm"
+    {
+      "account": "4qBSZdEoUxPVnUqbX8fjXovgtQXcHK7ZvSf56527XcDZUukq",
+      "description": "Treasury proposals transfers"
+    },
+    {
+      "account": "4oHvgA54py7SWFPpBCoubAajYrxj6xyc8yzHiAVryeAq574G",
+      "description": "Regular transfers"
+    },
+    {
+      "account": "4taHgf8x9U5b8oJaiYoNEh61jaHpKs9caUdattxfBRkJMHvm"
+    }
   ],
   "eip:1/slip44:60": [
-    "0x8f8221AFBB33998D8584A2B05749BA73C37A938A",
-    "0x6b175474e89094c44da98b954eedeac495271d0f"
+    {
+      "account": "0x8f8221AFBB33998D8584A2B05749BA73C37A938A",
+      "description": "NFT sales"
+    },
+    {
+      "account": "0x6b175474e89094c44da98b954eedeac495271d0f"
+    }
   ]
 }
 ```
