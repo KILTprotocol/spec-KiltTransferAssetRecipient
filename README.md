@@ -74,7 +74,7 @@ For example, with the object `O` being the example `serviceEndpoint` shown above
 
 ```json
 {
-  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#Ug10blEje4DrZsqVV7AfyUKoJ93Jgk8xkvxJkehTmO8o=",
+  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#Uc1JU0UF9iDfjaRkgHCFG2Rc5jki-cuhlgbEQcjN6-g0=",
   "type": [
     "KiltTransferAssetRecipientV1"
   ],
