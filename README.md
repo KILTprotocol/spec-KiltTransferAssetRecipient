@@ -79,7 +79,7 @@ For example, with the object `O` being the example `serviceEndpoint` shown above
     "KiltTransferAssetRecipientV1"
   ],
   "serviceEndpoint": [
-    "https://ipfs.io/ipfs/QmNUAwg7JPK9nnuZiUri5nDaqLHqUFtNoZYtfD22Q6w3c8"
+    "https://ipfs.io/ipfs/QmfLCY7Jxa4rRhpQ1FK3srtyM6C5ZLk4YmXfS7nm4Ur2GG"
   ]
 }
 ```
