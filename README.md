@@ -62,9 +62,9 @@ The value of the property for each asset MUST be a **unique** set of objects wit
 * `account`: The account encoded according to the chain rules. For example, for Spiritnet accounts, the account is the base58-prefixed encoding of the Spiritnet chain ID + the account public key. For Ethereum accounts, it's the 20-byte HEX representation of the account public key, prefixed with `0x`. Other chains have different encoding rules for accounts, and each chain defines the format and encoding logic for public keys representing accounts on those chains.
 * [OPTIONAL] `description`: The user-provided description for the specified account.
 * [OPTIONAL] `proof`: The proof of ownership of the specified account. This field is an object with the following structure:
-  * `scheme`: The signing scheme (e.g., the curve) used for the signature. For Polkadot accounts, this can be of type `schorr-ristretto-25519` for `sr25519` key types, `eddsa-25519` for `ed25519` key types, and `ecdsa-secp256k1` for `ecdsa` key types. Ethereum accounts are also of type `ecdsa-secp256k1`.
-  * `digest`: The digest scheme (e.g., the hash) used before signing the payload. For Polkadot accounts, this is typically `blake2b-256`. For Ethereum accounts, this is `keccak-256`.
-  * `signature`: The HEX-encoded signature over a specially-crafted payload that is described in the [section below](#proof-registry).
+  * `scheme`: The signing scheme (e.g., the curve) used for the signature. See the [section below](#digital-signature-schemes) for more details about this field.
+  * `digest`: The digest scheme (e.g., the hash) used before signing the payload. For Polkadot accounts, this is typically `blake2b-256`. For Ethereum accounts, this is `keccak-256`. See the [section below](#hashing-schemes) for more details about this field.
+  * `signature`: The HEX-encoded signature over a specially-crafted payload that is described in the [section below](#signature-generation-and-verification).
 
 The example above shows a `KiltTransferAssetRecipientV1` endpoint indicating other parties that the DID subject can accept transfers of the following three assets:
 
@@ -74,19 +74,19 @@ The example above shows a `KiltTransferAssetRecipientV1` endpoint indicating oth
 
 ### Object Normalisation and Hashing
 
-The `id` property of the endpoint MUST be the [multibase][multibase] representation of the Blake256 output calculated from the Base64 encoding of the normalised representation of the resource dereferenced by the URIs in `serviceEndpoint`.
-The multibase chosen must yield values that do not contain invalid characters as per the definition of the `id` property in the DID specification, i.e., the resulting `id` must still be a valid URI conforming to [RFC3986][rfc3986].
+The `id` property of the endpoint MUST be the [multibase][multibase] representation of the Blake2b-256 output calculated from the Base64 encoding of the normalised representation of the resource dereferenced by the URIs in `serviceEndpoint`.
+The multibase chosen MUST yield values that do not contain invalid characters as per the definition of the `id` property in the DID specification, i.e., the resulting `id` MUST still be a valid URI conforming to [RFC3986][rfc3986].
 
-The retrieved resource must be normalised before being hashed.
+The retrieved resource MUST be normalised before being hashed.
 For the scope of this spec, we consider **normalised** a resource that meets the following criteria:
 
-* No whitespaces in the document
-* The set of asset entries is alphabetically sorted in ascending order by the asset name. Because each asset is assumed to be unique, there is no possibility of conflict.
-* The set of accounts for each asset entry is alphabetically sorted in ascending order by the account address. Because each address is assumed to be unique, there is no possibility of conflict.
+* No whitespaces in the document expect for those that are part of a property
+* The set of asset entries is *alphabetically sorted in ascending order* by the asset name. Because each asset is assumed to be unique, there is no possibility of conflict.
+* The set of accounts for each asset entry is *alphabetically sorted in ascending order* by the account address. Because each address is assumed to be unique, there is no possibility of conflict.
 
 This normalisation step is required to ensure that two semantically-equivalent services do not hash to two different values and are hence considered two distinct ones.
 
-Hence, calling `M` the multibase encoding operation of some data, `H` the Blake256 hashing, `B` the binary representation of some information, and `N` the normalisation step, the service `id` for a given object `O` is `M(H(B(N(O))))`.
+Hence, calling `M` the multibase encoding operation of some data, `H` the Blake2b-256 hashing, `B` the binary representation of some information, and `N` the normalisation step, the service `id` for a given object `O` is `M(H(B(N(O))))`.
 For example, with the object `O` being the example `serviceEndpoint` shown above, and the multibase `M` being `base64urlpad`, the resulting service endpoint looks like the following:
 
 ```json
@@ -100,6 +100,8 @@ For example, with the object `O` being the example `serviceEndpoint` shown above
   ]
 }
 ```
+
+<!-- TODO: Add an example snippet, if needed -->
 
 ### Proof Registry
 
@@ -137,12 +139,12 @@ In short, the signatures represent proof that, at some point in the past, the DI
 
 ## Security Considerations
 
-The list of addresses where the DID owner wants to receive funds must always be under the subject's control even if stored off-chain.
+The list of addresses where the DID owner wants to receive funds MUST always be under the subject's control even if stored off-chain.
 This ensures the authenticity and integrity of the list.
 Implementations MUST verify that the list of addresses retrieved from the service URI can be hashed and encoded to the same value as the service `id` after following the normalisation and hashing steps outlined above.
-Failure to verify this condition MUST be treated as an attack either towards the DID subject or the entity willing to initiate the asset transfer, and the operation must be aborted.
+Failure to verify this condition MUST be treated as an attack either towards the DID subject or the entity willing to initiate the asset transfer, and the operation MUST be aborted.
 Where present, a `proof` MUST be verified as being generated by the account to which it refers, over the payload described [above](#proof-registry).
-Failure to verify this proof, e.g., if it belongs to a different DID or if it simply invalid, MUST be treated as an attack either towards the DID subject or the entity willing to initiate the asset transfer, and the operation must be aborted.
+Failure to verify this proof, e.g., if it belongs to a different DID or if it simply invalid, MUST be treated as an attack either towards the DID subject or the entity willing to initiate the asset transfer, and the operation MUST be aborted.
 The inclusion of the DID as part of the payload to be signed prevents a series of attacks where the same signature could be re-used in a different context, for instance if the DID subject switches to a different web3name and someone else claims the old web3name.
 With this proof attached to the address, it is not possible to simply re-use the same address for the new DID, since the payload and hence the signature would not match.
 
