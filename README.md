@@ -57,16 +57,14 @@ An example of the object described is given below.
 ```
 
 Each asset is identified by its [CAIP-19 identifier][caip-19-spec].
-The value of the property for each asset MUST be a unique set of objects with the following structure:
+The value of the property for each asset MUST be a **unique** set of objects with the following structure:
 
 * `account`: The account encoded according to the chain rules. For example, for Spiritnet accounts, the account is the base58-prefixed encoding of the Spiritnet chain ID + the account public key. For Ethereum accounts, it's the 20-byte HEX representation of the account public key, prefixed with `0x`. Other chains have different encoding rules for accounts, and each chain defines the format and encoding logic for public keys representing accounts on those chains.
 * [OPTIONAL] `description`: The user-provided description for the specified account.
 * [OPTIONAL] `proof`: The proof of ownership of the specified account. This field is an object with the following structure:
-  * `scheme`: The signing scheme (e.g., the curve) used for the signature. For Polkadot accounts, this can be of type `ristretto-25519` for `sr25519` key types, `curve-25519` for `ed25519` key types, and `secp256k1` for `ecdsa` key types. Ethereum accounts are also of type `secp256k1`.
-  * `digest`: The digest scheme (e.g., the hash) used before signing the payload. For Polkadot accounts, this is typically `blake2-256`. For Ethereum accounts, this is `keccak-256`.
+  * `scheme`: The signing scheme (e.g., the curve) used for the signature. For Polkadot accounts, this can be of type `schorr-ristretto-25519` for `sr25519` key types, `eddsa-25519` for `ed25519` key types, and `ecdsa-secp256k1` for `ecdsa` key types. Ethereum accounts are also of type `ecdsa-secp256k1`.
+  * `digest`: The digest scheme (e.g., the hash) used before signing the payload. For Polkadot accounts, this is typically `blake2b-256`. For Ethereum accounts, this is `keccak-256`.
   * `signature`: The HEX-encoded signature over a specially-crafted payload that is described in the [section below](#proof-registry).
-
-Because there is no single registry that contains all the definitions of the digital signature and hashing schemes, a list of allowed values is specified in the [section below](#proof-registry).
 
 The example above shows a `KiltTransferAssetRecipientV1` endpoint indicating other parties that the DID subject can accept transfers of the following three assets:
 
@@ -74,7 +72,7 @@ The example above shows a `KiltTransferAssetRecipientV1` endpoint indicating oth
 - *KILT Spiritnet tokens* sent to either of the addresses `4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM`, or `4nvZhWv71x8reD9gq7BUGYQQVvTiThnLpTTanyru9XckaeWa` (verified) on the KILT Spiritnet parachain.
 - *KSM tokens* sent to the address `EJDj2GKnx89HTzUkGW8Rk9RoYUmAJHPM8aacWFp3fi1gYUQ` on the Kusama relaychain.
 
-### Normalisation and Hashing
+### Object Normalisation and Hashing
 
 The `id` property of the endpoint MUST be the [multibase][multibase] representation of the Blake256 output calculated from the Base64 encoding of the normalised representation of the resource dereferenced by the URIs in `serviceEndpoint`.
 The multibase chosen must yield values that do not contain invalid characters as per the definition of the `id` property in the DID specification, i.e., the resulting `id` must still be a valid URI conforming to [RFC3986][rfc3986].
@@ -82,12 +80,13 @@ The multibase chosen must yield values that do not contain invalid characters as
 The retrieved resource must be normalised before being hashed.
 For the scope of this spec, we consider **normalised** a resource that meets the following criteria:
 
-* The set of asset entries is alphabetically sorted by the asset name. Because each asset is unique, there is no possibility of conflict.
-* The set of accounts for each asset entry is alphabetically sorted by the account address. Because each address is unique, there is no possibility of conflict.
+* No whitespaces in the document
+* The set of asset entries is alphabetically sorted in ascending order by the asset name. Because each asset is assumed to be unique, there is no possibility of conflict.
+* The set of accounts for each asset entry is alphabetically sorted in ascending order by the account address. Because each address is assumed to be unique, there is no possibility of conflict.
 
-This is required to ensure that two semantically-equivalent services do not hash to two different values and are hence considered two distinct ones.
+This normalisation step is required to ensure that two semantically-equivalent services do not hash to two different values and are hence considered two distinct ones.
 
-Hence, calling `M` the multibase encoding operation of some data, `H` the Blake256 hashing, and `B` the binary representation of some information, the service `id` for a given object `O` is `M(H(B(O)))`.
+Hence, calling `M` the multibase encoding operation of some data, `H` the Blake256 hashing, `B` the binary representation of some information, and `N` the normalisation step, the service `id` for a given object `O` is `M(H(B(N(O))))`.
 For example, with the object `O` being the example `serviceEndpoint` shown above, and the multibase `M` being `base64urlpad`, the resulting service endpoint looks like the following:
 
 ```json
@@ -104,13 +103,13 @@ For example, with the object `O` being the example `serviceEndpoint` shown above
 
 ### Proof Registry
 
-As there is no uniform place collecting definitions of hashing and digital signature schemes that are used in the crypto interactions, here is a list, meant to be extended, of all hashing and digital signature schemes that can be found in the `proof` object of a linked account, as well as the definition of what is the payload to generate such proof.
+As there is no extensive collection for definitions of hashing and digital signature schemes that are used in the crypto interactions, here is a list, meant to be extended, of all hashing and digital signature schemes that can be found in the `proof` object of a linked account, as well as the definition of what is the payload to generate such proof.
 
 #### Digital Signature Schemes
 
-* `schorr-ristretto-25519`: refers to the Schnorr signature on Ristretto-compressed Ed25519 points. They are typically identified as `sr25519` in the Polkadot ecosystem.
-* `eddsa-curve-25519`: refers to the EdDSA digital signature scheme based on Ed25519 points. They are typically identified as `ed25519` in the Polkadot ecosystem.
-* `ecdsa-secp256k1`: refers to the EDDSA digital signature scheme based on the secp256k1 curve. They are typically identified as `ecdsa` in the Polkadot ecosystem and are the default scheme for Ethereum and Bitcoin accounts.
+* `schorr-ristretto-25519`: the Schnorr signature on Ristretto-compressed Ed25519 points. They are typically identified as `sr25519` in the Polkadot ecosystem.
+* `eddsa-25519`: the EdDSA digital signature scheme based on Ed25519 points. They are typically identified as `ed25519` in the Polkadot ecosystem.
+* `ecdsa-secp256k1`: the EDDSA digital signature scheme based on the secp256k1 curve. They are typically identified as `ecdsa` in the Polkadot ecosystem and are the default scheme for Ethereum and Bitcoin accounts.
 
 #### Hashing Schemes
 
@@ -119,29 +118,33 @@ As there is no uniform place collecting definitions of hashing and digital signa
 
 ### Signature Generation and Verification
 
-Wherever possible, accounts exposed as part of this spec should also include a `proof` object that provides evidence of control of such an account by the DID subject.
+Wherever possible, accounts exposed as part of this spec SHOULD include the optional `proof` property that provides evidence of control of such an account by the DID subject.
 The payload to be signed is the same regardless of the account being exposed, and is the following UTF8-encoded string:
 
 ```
-Account linked to the DID <DID> and web3name <WEB3NAME>
+Account linked to the DID <DID>
 ```
 
-where `<DID>` is a KILT DID, e.g., `did:kilt:4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM` and `<WEB3NAME>` is the web3name linked to the DID, e.g., `w3n:ntn_x2`.
+where `<DID>` is a KILT DID, e.g., `did:kilt:4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM`.
 
-Compliant consumers of this information MUST verify that the DID **and** web3name included in the signed payload match the DID and the web3name of the party expected to receive the asset at the end of the transfer.
+The `signature` field is the HEX-encoded signature over the payload above, after it has been properly prepared for signature following the chain-specific message signing conventions.
+For example, in the case of Polkadot chains the payload is wrapped in the `<Bytes></Bytes>` tag before being hashed and signed.
+For Ethereum networks, the payload is prefixed with the concatenation of `\x19Ethereum Signed Message:\n` and the message length in bytes.
 
-The use of both the DID and the web3name as part of the payload to be signed prevents a series of attacks where the same signature could be re-used in a different context, for instance if the web3name is released by its original owner and claimed back by a different entity.
-With this proof attached to the address, it is not possible to simply re-use the same address for the new DID, since the payload and hence the signature would not match.
-
-The `signature` field is the HEX-encoded signature over the payload above, after it has been properly prepared for signature following the chain-specific signing conventions.
+Note that the signature does not include the information about the web3name of the DID subject, meaning that if the DID subject decides to claim a different web3name, the information inside this endpoint would still remain valid.
+At the same time, if a different DID subject claims the old web3name, the information becomes invalid as the information about the DID in the signed payload differs from the current DID aliased by the web3name.
+In short, the signatures represent proof that, at some point in the past, the DID in the payload was controlling the exposed account.
 
 ## Security Considerations
 
 The list of addresses where the DID owner wants to receive funds must always be under the subject's control even if stored off-chain.
 This ensures the authenticity and integrity of the list.
-Implementations must verify that the list of addresses retrieved from the service URI can be hashed and encoded to the same value as the service `id`.
+Implementations MUST verify that the list of addresses retrieved from the service URI can be hashed and encoded to the same value as the service `id` after following the normalisation and hashing steps outlined above.
 Failure to verify this condition MUST be treated as an attack either towards the DID subject or the entity willing to initiate the asset transfer, and the operation must be aborted.
-Where present, a `proof` must be verified as being generated by the account to which it refers, over the payload described in the [section above](#proof-registry). Failure to verify this proof, e.g., if it belongs to a different DID, a different web3name, or if it simply invalid, MUST be treated as an attack either towards the DID subject or the entity willing to initiate the asset transfer, and the operation must be aborted.
+Where present, a `proof` MUST be verified as being generated by the account to which it refers, over the payload described [above](#proof-registry).
+Failure to verify this proof, e.g., if it belongs to a different DID or if it simply invalid, MUST be treated as an attack either towards the DID subject or the entity willing to initiate the asset transfer, and the operation must be aborted.
+The inclusion of the DID as part of the payload to be signed prevents a series of attacks where the same signature could be re-used in a different context, for instance if the DID subject switches to a different web3name and someone else claims the old web3name.
+With this proof attached to the address, it is not possible to simply re-use the same address for the new DID, since the payload and hence the signature would not match.
 
 [did-core-spec]: https://www.w3.org/TR/did-core
 [kilt-did-spec]: https://github.com/KILTprotocol/spec-kilt-did
