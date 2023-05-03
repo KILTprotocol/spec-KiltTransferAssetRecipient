@@ -2,6 +2,8 @@
 
 # KiltTransferAssetRecipientV1
 
+<!-- TODO: Update snippets, signatures, hashes and IPFS CID once the final version of the document has been agreed on -->
+
 ### Editors
 
 - **Antonio Antonino** - KILT Protocol [antonio@kilt.io](mailto:antonio@kilt.io)
@@ -39,7 +41,7 @@ An example of the object described is given below.
       "account": "4nvZhWv71x8reD9gq7BUGYQQVvTiThnLpTTanyru9XckaeWa",
       "description": "Council account",
       "proof": {
-        "scheme": "ristretto25519",
+        "scheme": "schorr-ristretto-25519",
         "digest": "blake2b-256",
         "signature": "0xae5f4d97dd67d45f8c6cb7e4977b9bdd4ccdd14db341995ba5074bccbe27c004a17bcf4a53e1e6a1eaac135c5f2b492e7d84dbbe4d80c221d3caed915f7b1286"
       }
@@ -91,6 +93,37 @@ For example, with the object `O` being the example `serviceEndpoint` shown above
 ```
 
 ### Proof Registry
+
+As there is no uniform place collecting definitions of hashing and digital signature schemes that are used in the crypto interactions, here is a list, meant to be extended, of all hashing and digital signature schemes that can be found in the `proof` object of a linked account, as well as the definition of what is the payload to generate such proof.
+
+#### Digital Signature Schemes
+
+* `schorr-ristretto-25519`: refers to the Schnorr signature on Ristretto-compressed Ed25519 points. They are typically identified as `sr25519` in the Polkadot ecosystem.
+* `eddsa-curve-25519`: refers to the EdDSA digital signature scheme based on Ed25519 points. They are typically identified as `ed25519` in the Polkadot ecosystem.
+* `ecdsa-secp256k1`: refers to the EDDSA digital signature scheme based on the secp256k1 curve. They are typically identified as `ecdsa` in the Polkadot ecosystem and are the default scheme for Ethereum and Bitcoin accounts.
+
+#### Hashing Schemes
+
+* `blake2b-256`: Blake2b hash with 256 bit output. They are the most common choice for Polkadot networks.
+* `keccak-256`: Hashing scheme used by Ethereum with 256 bit output.
+
+### Signature Generation and Verification
+
+Wherever possible, accounts exposed as part of this spec should also include a `proof` object that provides evidence of control of such an account by the DID subject.
+The payload to be signed is the same regardless of the account being exposed, and is the following UTF8-encoded string:
+
+```
+Account linked to the DID <DID> and web3name <WEB3NAME>
+```
+
+where `<DID>` is a KILT DID, e.g., `did:kilt:4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM` and `<WEB3NAME>` is the web3name linked to the DID, e.g., `w3n:ntn_x2`.
+
+Compliant consumers of this information MUST verify that the DID **and** web3name included in the signed payload match the DID and the web3name of the party expected to receive the asset at the end of the transfer.
+
+The use of both the DID and the web3name as part of the payload to be signed prevents a series of attacks where the same signature could be re-used in a different context, for instance if the web3name is released by its original owner and claimed back by a different entity.
+With this proof attached to the address, it is not possible to simply re-use the same address for the new DID, since the payload and hence the signature would not match.
+
+The `signature` field is the HEX-encoded signature over the payload above, after it has been properly prepared for signature following the chain-specific signing conventions.
 
 ## Security considerations
 
