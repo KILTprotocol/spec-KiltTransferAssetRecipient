@@ -26,15 +26,13 @@ An example of the object described is given below.
 
 ```json
 {
-  "polkadot:b0a8d493285c2df73290dfb7e61f870f/slip44:434": [
-    {
-      "account": "EJDj2GKnx89HTzUkGW8Rk9RoYUmAJHPM8aacWFp3fi1gYUQ",
+  "polkadot:b0a8d493285c2df73290dfb7e61f870f/slip44:434": {
+    "EJDj2GKnx89HTzUkGW8Rk9RoYUmAJHPM8aacWFp3fi1gYUQ": {
       "description": "Personal account"
     }
-  ],
-  "polkadot:411f057b9107718c9624d6aa4a3f23c1/slip44:2086": [
-    {
-      "account": "4nvZhWv71x8reD9gq7BUGYQQVvTiThnLpTTanyru9XckaeWa",
+  },
+  "polkadot:411f057b9107718c9624d6aa4a3f23c1/slip44:2086": {
+    "4nvZhWv71x8reD9gq7BUGYQQVvTiThnLpTTanyru9XckaeWa": {
       "description": "Council account",
       "proof": {
         "scheme": "schorr-ristretto-25519",
@@ -42,29 +40,28 @@ An example of the object described is given below.
         "signature": "0xae5f4d97dd67d45f8c6cb7e4977b9bdd4ccdd14db341995ba5074bccbe27c004a17bcf4a53e1e6a1eaac135c5f2b492e7d84dbbe4d80c221d3caed915f7b1286"
       }
     },
-    {
-      "account": "4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM",
+    "4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM" : {
       "description": "Personal account"
     }
-  ],
-  "polkadot:91b171bb158e2d3848fa23a9f1c25182/slip44:354": [
-    {
-      "account": "15BQbTH5bKH63WCXTMPxbmpnWeXKpfuTKbpDkfFLXMPvpxD3",
+  },
+  "polkadot:91b171bb158e2d3848fa23a9f1c25182/slip44:354": {
+    "15BQbTH5bKH63WCXTMPxbmpnWeXKpfuTKbpDkfFLXMPvpxD3": {
       "description": "Personal account"
     }
-  ]
+  }
 }
 ```
 
 Each asset is identified by its [CAIP-19 identifier][caip-19-spec].
-The value of the property for each asset MUST be a **unique** set of objects with the following structure:
+The value of the property for each asset MUST be another object with the following structure:
 
-* `account`: The account encoded according to the chain rules. For example, for Spiritnet accounts, the account is the base58-prefixed encoding of the Spiritnet chain ID + the account public key. For Ethereum accounts, it's the 20-byte HEX representation of the account public key, prefixed with `0x`. Other chains have different encoding rules for accounts, and each chain defines the format and encoding logic for public keys representing accounts on those chains.
-* [OPTIONAL] `description`: The user-provided description for the specified account.
-* [OPTIONAL] `proof`: The proof of ownership of the specified account. This field is an object with the following structure:
-  * `scheme`: The signing scheme (e.g., the curve) used for the signature. See the [section below](#digital-signature-schemes) for more details about this field.
-  * `digest`: The digest scheme (e.g., the hash) used before signing the payload. For Polkadot accounts, this is typically `blake2b-256`. For Ethereum accounts, this is `keccak-256`. See the [section below](#hashing-schemes) for more details about this field.
-  * `signature`: The HEX-encoded signature over a specially-crafted payload that is described in the [section below](#signature-generation-and-verification).
+* One key for each `account` that can receive assets of the specified type. The account MUST be encoded according to the rules of the chain on which the asset lives. For example, for Spiritnet accounts, the account is the base58-prefixed encoding of the Spiritnet chain ID + the account public key. For Ethereum accounts, it's the 20-byte HEX representation of the account public key, prefixed with `0x`. Other chains have different encoding rules for accounts, and each chain defines the format and encoding logic for public keys representing accounts on those chains.
+* For each account, an object with the following properties:
+  * [OPTIONAL] `description`: The user-provided description for the specified account.
+  * [OPTIONAL] `proof`: The proof of ownership of the specified account. This field is an object with the following structure:
+    * `scheme`: The signing scheme (e.g., the curve) used for the signature. See the [section below](#digital-signature-schemes) for more details about this field.
+    * `digest`: The digest scheme (e.g., the hash) used before signing the payload. For Polkadot accounts, this is typically `blake2b-256`. For Ethereum accounts, this is `keccak-256`. See the [section below](#hashing-schemes) for more details about this field.
+    * `signature`: The HEX-encoded signature over a specially-crafted payload that is described in the [section below](#signature-generation-and-verification).
 
 The example above shows a `KiltTransferAssetRecipientV1` endpoint indicating other parties that the DID subject can accept transfers of the following three assets:
 
@@ -72,21 +69,15 @@ The example above shows a `KiltTransferAssetRecipientV1` endpoint indicating oth
 - *KILT Spiritnet tokens* sent to either of the addresses `4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM`, or `4nvZhWv71x8reD9gq7BUGYQQVvTiThnLpTTanyru9XckaeWa` (verified) on the KILT Spiritnet parachain.
 - *KSM tokens* sent to the address `EJDj2GKnx89HTzUkGW8Rk9RoYUmAJHPM8aacWFp3fi1gYUQ` on the Kusama relaychain.
 
-### Object Normalisation and Hashing
+### Object Canonicalization and Hashing
 
-The `id` property of the endpoint MUST be the [multibase][multibase] representation of the Blake2b-256 output calculated from the Base64 encoding of the normalised representation of the resource dereferenced by the URIs in `serviceEndpoint`.
+The `id` property of the endpoint MUST be the [multibase][multibase] representation of the Blake2b-256 output calculated from the Base64 encoding of the [canonical representation][rfc8785] of the resource dereferenced by the URIs in `serviceEndpoint`.
 The multibase chosen MUST yield values that do not contain invalid characters as per the definition of the `id` property in the DID specification, i.e., the resulting `id` MUST still be a valid URI conforming to [RFC3986][rfc3986].
 
-The retrieved resource MUST be normalised before being hashed.
-For the scope of this spec, we consider **normalised** a resource that meets the following criteria:
+The retrieved resource MUST be canonicalized before being hashed, according to the [RFC 8785 specification][rfc8785].
+This canonicalization step is required to ensure that two semantically-equivalent services do not hash to two different values.
 
-* No whitespaces in the document expect for those that are part of a property
-* The set of asset entries is *alphabetically sorted in ascending order* by the asset name. Because each asset is assumed to be unique, there is no possibility of conflict.
-* The set of accounts for each asset entry is *alphabetically sorted in ascending order* by the account address. Because each address is assumed to be unique, there is no possibility of conflict.
-
-This normalisation step is required to ensure that two semantically-equivalent services do not hash to two different values and are hence considered two distinct ones.
-
-Hence, calling `M` the multibase encoding operation of some data, `H` the Blake2b-256 hashing, `B` the binary representation of some information, and `N` the normalisation step, the service `id` for a given object `O` is `M(H(B(N(O))))`.
+Hence, calling `M` the multibase encoding operation of some data, `H` the Blake2b-256 hashing, `B` the binary representation of some information, and `N` the canonicalization step, the service `id` for a given object `O` is `M(H(B(N(O))))`.
 For example, with the object `O` being the example `serviceEndpoint` shown above, and the multibase `M` being `base64urlpad`, the resulting service endpoint looks like the following:
 
 ```json
@@ -101,7 +92,52 @@ For example, with the object `O` being the example `serviceEndpoint` shown above
 }
 ```
 
-<!-- TODO: Add an example snippet, if needed -->
+A Typescript snippet showing how to derive the service ID for the example document above is shown below:
+
+```ts
+import { blake2AsU8a } from '@polkadot/util-crypto'
+import * as multibase from 'multibase'
+import canonicalize from 'canonicalize'
+
+const doc = `
+{
+  "polkadot:b0a8d493285c2df73290dfb7e61f870f/slip44:434": {
+    "EJDj2GKnx89HTzUkGW8Rk9RoYUmAJHPM8aacWFp3fi1gYUQ": {
+      "description": "Personal account"
+    }
+  },
+  "polkadot:411f057b9107718c9624d6aa4a3f23c1/slip44:2086": {
+    "4nvZhWv71x8reD9gq7BUGYQQVvTiThnLpTTanyru9XckaeWa": {
+      "description": "Council account",
+      "proof": {
+        "scheme": "schorr-ristretto-25519",
+        "digest": "blake2b-256",
+        "signature": "0xae5f4d97dd67d45f8c6cb7e4977b9bdd4ccdd14db341995ba5074bccbe27c004a17bcf4a53e1e6a1eaac135c5f2b492e7d84dbbe4d80c221d3caed915f7b1286"
+      }
+    },
+    "4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM" : {
+      "description": "Personal account"
+    }
+  },
+  "polkadot:91b171bb158e2d3848fa23a9f1c25182/slip44:354": {
+    "15BQbTH5bKH63WCXTMPxbmpnWeXKpfuTKbpDkfFLXMPvpxD3": {
+      "description": "Personal account"
+    }
+  }
+}
+`
+
+async function main() {
+  const jsonInput = JSON.parse(doc)
+  const canonicalJson = canonicalize(jsonInput)
+  const buffer = Buffer.from(canonicalJson as any)
+  const hash = blake2AsU8a(buffer)
+  const encoded = multibase.encode('base64urlpad', hash)
+  console.log(Buffer.from(encoded).toString('utf-8'))
+}
+
+main()
+```
 
 ### Proof Registry
 
@@ -141,7 +177,7 @@ In short, the signatures represent proof that, at some point in the past, the DI
 
 The list of addresses where the DID owner wants to receive funds MUST always be under the subject's control even if stored off-chain.
 This ensures the authenticity and integrity of the list.
-Implementations MUST verify that the list of addresses retrieved from the service URI can be hashed and encoded to the same value as the service `id` after following the normalisation and hashing steps outlined above.
+Implementations MUST verify that the list of addresses retrieved from the service URI can be hashed and encoded to the same value as the service `id` after following the canonicalization and hashing steps outlined above.
 Failure to verify this condition MUST be treated as an attack either towards the DID subject or the entity willing to initiate the asset transfer, and the operation MUST be aborted.
 Where present, a `proof` MUST be verified as being generated by the account to which it refers, over the payload described [above](#proof-registry).
 If the `proof` contains a `scheme` or a `digest` that is not defined in this specification, then the `proof` MUST fail to be verified.
@@ -158,3 +194,4 @@ With this proof attached to the address, it is not possible to simply re-use the
 [caip-2-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-2.md
 [caip-13-spec]: https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-13.md
 [rfc3986]: https://www.w3.org/TR/did-core/#bib-rfc3986
+[rfc8785]: https://datatracker.ietf.org/doc/html/rfc8785
