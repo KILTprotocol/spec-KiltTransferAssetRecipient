@@ -17,7 +17,7 @@ This document defines an extension to the service types supported in the [DID Co
 The goal of the endpoints of this class is to expose a collection (i.e., a list) of addresses to which assets of some class can be sent to.
 For more information about the KILT DID method, please visit our [official specification][kilt-did-spec].
 
-## Data structure
+## Data Structure
 
 A service endpoint of type `KiltTransferAssetRecipientV1` does not include any additional properties compared to what is defined within the [relative section of the official DID Core spec][did-core-spec-services].
 Furthermore, endpoints of such type MUST include at least *one* URI for the `serviceEndpoint` property.
@@ -26,17 +26,13 @@ An example of the object described is given below.
 
 ```json
 {
-  "polkadot:91b171bb158e2d3848fa23a9f1c25182/slip44:354": [
+  "polkadot:b0a8d493285c2df73290dfb7e61f870f/slip44:434": [
     {
-      "account": "15BQbTH5bKH63WCXTMPxbmpnWeXKpfuTKbpDkfFLXMPvpxD3",
+      "account": "EJDj2GKnx89HTzUkGW8Rk9RoYUmAJHPM8aacWFp3fi1gYUQ",
       "description": "Personal account"
     }
   ],
   "polkadot:411f057b9107718c9624d6aa4a3f23c1/slip44:2086": [
-    {
-      "account": "4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM",
-      "description": "Personal account"
-    },
     {
       "account": "4nvZhWv71x8reD9gq7BUGYQQVvTiThnLpTTanyru9XckaeWa",
       "description": "Council account",
@@ -45,11 +41,15 @@ An example of the object described is given below.
         "digest": "blake2b-256",
         "signature": "0xae5f4d97dd67d45f8c6cb7e4977b9bdd4ccdd14db341995ba5074bccbe27c004a17bcf4a53e1e6a1eaac135c5f2b492e7d84dbbe4d80c221d3caed915f7b1286"
       }
+    },
+    {
+      "account": "4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM",
+      "description": "Personal account"
     }
   ],
-  "polkadot:b0a8d493285c2df73290dfb7e61f870f/slip44:434": [
+  "polkadot:91b171bb158e2d3848fa23a9f1c25182/slip44:354": [
     {
-      "account": "EJDj2GKnx89HTzUkGW8Rk9RoYUmAJHPM8aacWFp3fi1gYUQ",
+      "account": "15BQbTH5bKH63WCXTMPxbmpnWeXKpfuTKbpDkfFLXMPvpxD3",
       "description": "Personal account"
     }
   ]
@@ -62,7 +62,7 @@ The value of the property for each asset MUST be a unique set of objects with th
 * `account`: The account encoded according to the chain rules. For example, for Spiritnet accounts, the account is the base58-prefixed encoding of the Spiritnet chain ID + the account public key. For Ethereum accounts, it's the 20-byte HEX representation of the account public key, prefixed with `0x`. Other chains have different encoding rules for accounts, and each chain defines the format and encoding logic for public keys representing accounts on those chains.
 * [OPTIONAL] `description`: The user-provided description for the specified account.
 * [OPTIONAL] `proof`: The proof of ownership of the specified account. This field is an object with the following structure:
-  * `scheme`: The signing scheme (e.g., the curve) used for the signature. For Polkadot accounts, this can be of type `ristretto25519` for `sr25519` key types, `curve25519` for `ed25519` key types, and `secp256k1` for `ecdsa` key types. Ethereum accounts are also of type `secp256k1`.
+  * `scheme`: The signing scheme (e.g., the curve) used for the signature. For Polkadot accounts, this can be of type `ristretto-25519` for `sr25519` key types, `curve-25519` for `ed25519` key types, and `secp256k1` for `ecdsa` key types. Ethereum accounts are also of type `secp256k1`.
   * `digest`: The digest scheme (e.g., the hash) used before signing the payload. For Polkadot accounts, this is typically `blake2-256`. For Ethereum accounts, this is `keccak-256`.
   * `signature`: The HEX-encoded signature over a specially-crafted payload that is described in the [section below](#proof-registry).
 
@@ -74,8 +74,18 @@ The example above shows a `KiltTransferAssetRecipientV1` endpoint indicating oth
 - *KILT Spiritnet tokens* sent to either of the addresses `4tMSjvHfWBNQw4tYGvkbRp7BBpwAB6S24LuMDcASYgnGnRTM`, or `4nvZhWv71x8reD9gq7BUGYQQVvTiThnLpTTanyru9XckaeWa` (verified) on the KILT Spiritnet parachain.
 - *KSM tokens* sent to the address `EJDj2GKnx89HTzUkGW8Rk9RoYUmAJHPM8aacWFp3fi1gYUQ` on the Kusama relaychain.
 
-The `id` property of the endpoint MUST be the [multibase][multibase] representation of the Blake256 output calculated from the Base64 encoding of the resource dereferenced by the URIs in `serviceEndpoint`.
+### Normalisation and Hashing
+
+The `id` property of the endpoint MUST be the [multibase][multibase] representation of the Blake256 output calculated from the Base64 encoding of the normalised representation of the resource dereferenced by the URIs in `serviceEndpoint`.
 The multibase chosen must yield values that do not contain invalid characters as per the definition of the `id` property in the DID specification, i.e., the resulting `id` must still be a valid URI conforming to [RFC3986][rfc3986].
+
+The retrieved resource must be normalised before being hashed.
+For the scope of this spec, we consider **normalised** a resource that meets the following criteria:
+
+* The set of asset entries is alphabetically sorted by the asset name. Because each asset is unique, there is no possibility of conflict.
+* The set of accounts for each asset entry is alphabetically sorted by the account address. Because each address is unique, there is no possibility of conflict.
+
+This is required to ensure that two semantically-equivalent services do not hash to two different values and are hence considered two distinct ones.
 
 Hence, calling `M` the multibase encoding operation of some data, `H` the Blake256 hashing, and `B` the binary representation of some information, the service `id` for a given object `O` is `M(H(B(O)))`.
 For example, with the object `O` being the example `serviceEndpoint` shown above, and the multibase `M` being `base64urlpad`, the resulting service endpoint looks like the following:
@@ -125,7 +135,7 @@ With this proof attached to the address, it is not possible to simply re-use the
 
 The `signature` field is the HEX-encoded signature over the payload above, after it has been properly prepared for signature following the chain-specific signing conventions.
 
-## Security considerations
+## Security Considerations
 
 The list of addresses where the DID owner wants to receive funds must always be under the subject's control even if stored off-chain.
 This ensures the authenticity and integrity of the list.
