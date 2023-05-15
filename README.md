@@ -48,6 +48,12 @@ An example of the object described is given below.
     "15BQbTH5bKH63WCXTMPxbmpnWeXKpfuTKbpDkfFLXMPvpxD3": {
       "description": "Personal account"
     }
+  },
+  "eip:1/slip44:60": {
+    "0x6b175474e89094c44da98b954eedeac495271d0f": {},
+    "0x8f8221AFBB33998D8584A2B05749BA73C37A938A": {
+      "description": "NFT sales"
+    }
   }
 }
 ```
