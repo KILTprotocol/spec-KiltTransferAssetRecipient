@@ -7,11 +7,6 @@
 - **Antonio Antonino** - KILT Protocol [antonio@kilt.io](mailto:antonio@kilt.io)
 - **Albrecht Weiche** - KILT Protocol [albrecht@kilt.io](mailto:albrecht@kilt.io)
 
-### Version History
-
-<!-- TODO: Update before releasing -->
-- **v1.0 - Feb.09 2023**: Initial spec publishing
-
 ---
 
 ## Abstract
