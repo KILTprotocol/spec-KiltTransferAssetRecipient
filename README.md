@@ -16,7 +16,7 @@ For more information about the KILT DID method, please visit our [official speci
 
 ## Data Structure
 
-A service endpoint of type `KiltTransferAssetRecipientV1` does not include any additional properties compared to what is defined within the [relative section of the official DID Core spec][did-core-spec-services].
+A service endpoint of type `KiltTransferAssetRecipientV2` does not include any additional properties compared to what is defined within the [relative section of the official DID Core spec][did-core-spec-services].
 Furthermore, endpoints of such type MUST include at least *one* URI for the `serviceEndpoint` property.
 Each of the URIs in `serviceEndpoint`, when dereferenced, MUST return **a JSON object** with a mapping from each type of asset to the list of accounts the DID subject controls for that asset, optionally with a description of each account.
 An example of the object described is given below.
@@ -50,7 +50,6 @@ An example of the object described is given below.
 }
 ```
 
-
 Each asset is identified by its [CAIP-19 identifier][caip-19-spec].
 The value of the property for each asset MUST be another object with the following structure:
 
@@ -78,12 +77,12 @@ For example, with the object `O` being the example `serviceEndpoint` shown above
 
 ```json
 {
-  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#UHfpCR8mCNP5FvNRjN7rLHm7DA8fm7bqB6Pd4fGjaJ4Y=",
+  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#Uif4uWQYSXeeMLAQPNX2aEJvMEmHGkvEqcL-zZdKkRhM=",
   "type": [
-    "KiltTransferAssetRecipientV1"
+    "KiltTransferAssetRecipientV2"
   ],
   "serviceEndpoint": [
-    "https://ipfs.io/ipfs/QmYbmJiuUtuNjFA7L7HVCgCCK2GFbxZ2VttFgTvurrfZff"
+    "https://gist.githubusercontent.com/ntn-x2/375d047e6be61d243b9cf645bc94a436/raw/f41c9f4976e09a29e6bd63f84eabdcd0f6cf2f4d/KiltTransferAssetRecipientV2-example.json"
   ]
 }
 ```
@@ -124,7 +123,7 @@ const doc = `
 }
 `
 
-async function main() {
+function main() {
   const jsonInput = JSON.parse(doc)
   const canonicalJson = canonicalize(jsonInput)
   const buffer = Buffer.from(canonicalJson as any)
