@@ -41,7 +41,7 @@ An example of the object described is given below.
       "description": "Personal account"
     }
   },
-  "eip:1/slip44:60": {
+  "eip:155/slip44:60": {
     "0x6b175474e89094c44da98b954eedeac495271d0f": {},
     "0x8f8221AFBB33998D8584A2B05749BA73C37A938A": {
       "description": "NFT sales"
@@ -77,7 +77,7 @@ For example, with the object `O` being the example `serviceEndpoint` shown above
 
 ```json
 {
-  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#Uif4uWQYSXeeMLAQPNX2aEJvMEmHGkvEqcL-zZdKkRhM=",
+  "id": "did:kilt:4pqDzaWi3w7TzYzGnQDyrasK6UnyNnW6JQvWRrq6r8HzNNGy#U2pYgrYA3BUaOJK-abd1oufkYKTOJNCjZTp4-oHP69Zw=",
   "type": [
     "KiltTransferAssetRecipientV2"
   ],
@@ -114,7 +114,7 @@ const doc = `
       "description": "Personal account"
     }
   },
-  "eip:1/slip44:60": {
+  "eip:155/slip44:60": {
     "0x6b175474e89094c44da98b954eedeac495271d0f": {},
     "0x8f8221AFBB33998D8584A2B05749BA73C37A938A": {
       "description": "NFT sales"
